@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from .models import db, User, Property
 
-# Create a blueprint for the API routes
+# Create a blueprint for the API routes (to group the api routes together)
 api_bp = Blueprint('api', __name__)
 
 # Route for user registration
@@ -21,6 +21,7 @@ def register():
         email=data['email'], 
         password_hash=hashed_password, 
         role=data['role']
+
     )
     
     # Add the new user to the database
