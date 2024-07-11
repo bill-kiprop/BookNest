@@ -1,11 +1,15 @@
-from flask import Blueprint, request, jsonify
+from flask import Flask, request, jsonify
 from app_init import db
 from app.models import User, Property, Review
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
-api_bp = Blueprint('api', __name__)
+app = Flask(__name__)
 
-@api_bp.route('/login', methods=['POST'])
+# Configure JWT
+app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'  # Change this to your actual secret key
+jwt = JWTManager(app)
+
+@app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     email = data.get('email')
@@ -18,7 +22,7 @@ def login():
     access_token = create_access_token(identity={'email': user.email, 'role': user.role})
     return jsonify(access_token=access_token), 200
 
-@api_bp.route('/properties', methods=['POST'])
+@app.route('/properties', methods=['POST'])
 @jwt_required()
 def add_property():
     data = request.get_json()
@@ -38,7 +42,7 @@ def add_property():
     db.session.commit()
     return jsonify({"msg": "Property created successfully!"}), 200
 
-@api_bp.route('/properties/<int:id>', methods=['PUT'])
+@app.route('/properties/<int:id>', methods=['PUT'])
 @jwt_required()
 def edit_property(id):
     data = request.get_json()
@@ -56,7 +60,7 @@ def edit_property(id):
     db.session.commit()
     return jsonify({"msg": "Property updated successfully!"}), 200
 
-@api_bp.route('/properties/<int:id>', methods=['DELETE'])
+@app.route('/properties/<int:id>', methods=['DELETE'])
 @jwt_required()
 def delete_property(id):
     current_user = get_jwt_identity()
@@ -70,7 +74,7 @@ def delete_property(id):
     db.session.commit()
     return jsonify({"msg": "Property deleted successfully!"}), 200
 
-@api_bp.route('/reviews', methods=['POST'])
+@app.route('/reviews', methods=['POST'])
 @jwt_required()
 def add_review():
     data = request.get_json()
@@ -87,7 +91,7 @@ def add_review():
     db.session.commit()
     return jsonify({"msg": "Review added successfully!"}), 200
 
-@api_bp.route('/reviews/<int:id>', methods=['PUT'])
+@app.route('/reviews/<int:id>', methods=['PUT'])
 @jwt_required()
 def edit_review(id):
     data = request.get_json()
@@ -104,8 +108,11 @@ def edit_review(id):
     db.session.commit()
     return jsonify({"msg": "Review updated successfully!"}), 200
 
-@api_bp.route('/reviews', methods=['GET'])
+@app.route('/reviews', methods=['GET'])
 def display_reviews():
     reviews = Review.query.all()
     reviews_list = [{"content": r.content, "rating": r.rating, "user_id": r.user_id, "property_id": r.property_id} for r in reviews]
     return jsonify(reviews_list), 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
