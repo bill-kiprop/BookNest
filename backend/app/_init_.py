@@ -8,7 +8,7 @@ def create_app():
     app = Flask(__name__)
 
     # Configurations
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@localhost/booknest'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
     app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
