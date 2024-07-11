@@ -43,3 +43,4 @@ class Profile(db.Model):
     fullname = db.Column(db.Text, nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
     address = db.Column(db.Text, nullable=False)
+
