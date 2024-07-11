@@ -1,98 +1,118 @@
-from flask import Blueprint, request, jsonify
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from .models import db, User, Property
+from flask import Flask, request, jsonify
+from app_init import db
+from app.models import User, Property, Review
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
-# Create a blueprint for the API routes (to group the api routes together)
-api_bp = Blueprint('api', __name__)
+app = Flask(__name__)
 
-# Route for user registration
-@api_bp.route('/register', methods=['POST'])
-def register():
-    # Get the data from the request body
-    data = request.get_json()
-    
-    # Hash the user's password for security
-    hashed_password = generate_password_hash(data['password'], method='sha256')
-    
-    # Create a new user instance
-    new_user = User(
-        username=data['username'], 
-        email=data['email'], 
-        password_hash=hashed_password, 
-        role=data['role']
+# Configure JWT
+app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'  # Change this to your actual secret key
+jwt = JWTManager(app)
 
-    )
-    
-    # Add the new user to the database
-    db.session.add(new_user)
-    db.session.commit()
-    
-    # Return a success message
-    return jsonify({'message': 'User registered successfully!'})
-
-# Route for user login
-@api_bp.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
-    # Get the data from the request body
     data = request.get_json()
-    
-    # Find the user by email
-    user = User.query.filter_by(email=data['email']).first()
-    
-    # Check if user exists and password is correct
-    if not user or not check_password_hash(user.password_hash, data['password']):
-        return jsonify({'message': 'Invalid credentials'}), 401
-    
-    # Create a JWT access token
-    access_token = create_access_token(identity={'username': user.username, 'role': user.role})
-    
-    # Return the access token
-    return jsonify({'token': access_token})
+    email = data.get('email')
+    password = data.get('password')
 
-# Route to create a new property (requires authentication)
-@api_bp.route('/properties', methods=['POST'])
+    user = User.query.filter_by(email=email, password_hash=password).first()
+    if not user:
+        return jsonify({"msg": "Bad email or password"}), 401
+
+    access_token = create_access_token(identity={'email': user.email, 'role': user.role})
+    return jsonify(access_token=access_token), 200
+
+@app.route('/properties', methods=['POST'])
 @jwt_required()
-def create_property():
-    # Get the current user's identity from the JWT
-    current_user = get_jwt_identity()
-    
-    # Find the user in the database
-    user = User.query.filter_by(username=current_user['username']).first()
-    
-    # Check if the user has the 'host' role
-    if user.role != 'host':
-        return jsonify({'message': 'Permission denied'}), 403
-    
-    # Get the data from the request body
+def add_property():
     data = request.get_json()
-    
-    # Create a new property instance
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user['email']).first()
+
+    if user.role != 'host':
+        return jsonify({"msg": "Permission denied"}), 403
+
     new_property = Property(
         name=data['name'],
         description=data['description'],
         address=data['address'],
         host_id=user.id
     )
-    
-    # Add the new property to the database
     db.session.add(new_property)
     db.session.commit()
-    
-    # Return a success message
-    return jsonify({'message': 'Property created successfully!'})
+    return jsonify({"msg": "Property created successfully!"}), 200
 
-# Route to get all properties
-@api_bp.route('/properties', methods=['GET'])
-def get_properties():
-    # Query all properties from the database
-    properties = Property.query.all()
-    
-    # Return the properties as a list of dictionaries
-    return jsonify([{
-        'id': property.id,
-        'name': property.name,
-        'description': property.description,
-        'address': property.address,
-        'host_id': property.host_id
-    } for property in properties])
+@app.route('/properties/<int:id>', methods=['PUT'])
+@jwt_required()
+def edit_property(id):
+    data = request.get_json()
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user['email']).first()
+
+    property = Property.query.get(id)
+    if property.host_id != user.id:
+        return jsonify({"msg": "Permission denied"}), 403
+
+    property.name = data.get('name', property.name)
+    property.description = data.get('description', property.description)
+    property.address = data.get('address', property.address)
+
+    db.session.commit()
+    return jsonify({"msg": "Property updated successfully!"}), 200
+
+@app.route('/properties/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_property(id):
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user['email']).first()
+
+    property = Property.query.get(id)
+    if property.host_id != user.id:
+        return jsonify({"msg": "Permission denied"}), 403
+
+    db.session.delete(property)
+    db.session.commit()
+    return jsonify({"msg": "Property deleted successfully!"}), 200
+
+@app.route('/reviews', methods=['POST'])
+@jwt_required()
+def add_review():
+    data = request.get_json()
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user['email']).first()
+
+    new_review = Review(
+        content=data['content'],
+        rating=data['rating'],
+        user_id=user.id,
+        property_id=data['property_id']
+    )
+    db.session.add(new_review)
+    db.session.commit()
+    return jsonify({"msg": "Review added successfully!"}), 200
+
+@app.route('/reviews/<int:id>', methods=['PUT'])
+@jwt_required()
+def edit_review(id):
+    data = request.get_json()
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user['email']).first()
+
+    review = Review.query.get(id)
+    if review.user_id != user.id:
+        return jsonify({"msg": "Permission denied"}), 403
+
+    review.content = data.get('content', review.content)
+    review.rating = data.get('rating', review.rating)
+
+    db.session.commit()
+    return jsonify({"msg": "Review updated successfully!"}), 200
+
+@app.route('/reviews', methods=['GET'])
+def display_reviews():
+    reviews = Review.query.all()
+    reviews_list = [{"content": r.content, "rating": r.rating, "user_id": r.user_id, "property_id": r.property_id} for r in reviews]
+    return jsonify(reviews_list), 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
