@@ -1,29 +1,24 @@
 import os
 from datetime import timedelta
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
-from models import db
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from models import db, User, Property, Review
 
 # Initialize Flask application
 app = Flask(__name__)
+app.config.from_object('config.Config')
 
 # Configure database URI
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_ECHO'] = True
 
-# JWT configurations
-app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'your_jwt_secret_key')
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
-
-
+# Initialize database
+db.init_app(app)
 migrate = Migrate(app, db)
-
-# CORS configuration
-CORS(app)
 
 # Initialize Bcrypt
 bcrypt = Bcrypt(app)
@@ -31,26 +26,15 @@ bcrypt = Bcrypt(app)
 # Initialize JWTManager
 jwt = JWTManager(app)
 
-db.init_app(app)
+# CORS configuration
+CORS(app)
 
+# Routes
+
+# Home page route
 @app.route('/')
 def home():
     return '<h1>Home page</h1>'
-
- # this file will initialize the flask application, define all routes and handle application logic 
-
-# app.py
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from models import db, User, Property, Room, Booking, Review, Profile
-import os
-
-app = Flask(__name__)
-app.config.from_object('config.Config')
-
-db.init_app(app)  # Initialize the database with the app
-jwt = JWTManager(app)
 
 # User Registration
 @app.route('/register', methods=['POST'])
