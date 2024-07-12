@@ -1,4 +1,16 @@
-from app import db  # Adjust this import based on your directory structure
+  # Adjust this import based on your directory structure
+from sqlalchemy import MetaData
+from flask_sqlalchemy import SQLAlchemy
+# contains definitions of tables and associated schema constructs
+metadata = MetaData()
+
+# create the Flask SQLAlchemy extension
+db = SQLAlchemy(metadata=metadata)
+
+
+
+
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
