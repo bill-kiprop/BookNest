@@ -1,11 +1,16 @@
 # defines the database models (user, property, review, payment using SQLAlchemy)
 
-  #
 # models.py
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
+
+# Association table for many-to-many relationship
+property_amenity = db.Table('property_amenity',
+    db.Column('property_id', db.Integer, db.ForeignKey('property.id'), primary_key=True),
+    db.Column('amenity_id', db.Integer, db.ForeignKey('amenity.id'), primary_key=True)
+)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,6 +35,8 @@ class Property(db.Model):
     description = db.Column(db.Text, nullable=False)
     address = db.Column(db.String(200), nullable=False)
     images = db.Column(db.Integer, nullable=False)
+    amenities = db.relationship('Amenity', secondary=property_amenity, lazy='subquery',
+        backref=db.backref('properties', lazy=True))
 
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -58,3 +65,7 @@ class Profile(db.Model):
     fullname = db.Column(db.Text, nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
     address = db.Column(db.Text, nullable=False)
+
+class Amenity(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
