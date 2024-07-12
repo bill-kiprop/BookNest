@@ -7,6 +7,11 @@ name = "pypi"
 flask-restful = "*"
 flask = "*"
 flask-jwt-extended = "*"
+sqlalchemy = "*"
+jsonify = "*"
+werkzeug = "*"
+flask-sqlalchemy = "*"
+flask-wtf = "*"
 
 [dev-packages]
 

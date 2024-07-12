@@ -1,16 +1,11 @@
-  # Adjust this import based on your directory structure
-from sqlalchemy import MetaData
+# defines the database models (user, property, review, payment using SQLAlchemy)
+
+  #
+# models.py
 from flask_sqlalchemy import SQLAlchemy
-# contains definitions of tables and associated schema constructs
-metadata = MetaData()
+from werkzeug.security import generate_password_hash, check_password_hash
 
-# create the Flask SQLAlchemy extension
-db = SQLAlchemy(metadata=metadata)
-
-
-
-
-
+db = SQLAlchemy()
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -19,6 +14,14 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(20), nullable=False)
     images = db.Column(db.Integer, nullable=False)
+
+    def set_password(self, password):
+        """Hash the password and store it."""
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        """Check hashed password against provided password."""
+        return check_password_hash(self.password_hash, password)
 
 class Property(db.Model):
     id = db.Column(db.Integer, primary_key=True)
