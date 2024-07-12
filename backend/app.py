@@ -1,17 +1,45 @@
- # this file will initialize the flask application, define all routes and handle application logic 
-
-# app.py
+import os
+from datetime import timedelta
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_cors import CORS
+from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+<<<<<<< HEAD
 from models import db, User, Property, Room, Booking, Review, Profile, Amenity
 import os
+=======
+from models import db, User, Property, Review
+>>>>>>> origin/cynan
 
+# Initialize Flask application
 app = Flask(__name__)
 app.config.from_object('config.Config')
 
-db.init_app(app)  # Initialize the database with the app
+# Configure database URI
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_ECHO'] = True
+
+# Initialize database
+db.init_app(app)
+migrate = Migrate(app, db)
+
+# Initialize Bcrypt
+bcrypt = Bcrypt(app)
+
+# Initialize JWTManager
 jwt = JWTManager(app)
+
+# CORS configuration
+CORS(app)
+
+# Routes
+
+# Home page route
+@app.route('/')
+def home():
+    return '<h1>Home page</h1>'
 
 # User Registration
 @app.route('/register', methods=['POST'])
