@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-# defines the database models (user, property, review, payment using SQLAlchemy)
-
-# models.py
-=======
-from sqlalchemy import MetaData
->>>>>>> origin/cynan
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -18,20 +11,16 @@ convention = {
     "pk": "pk_%(table_name)s"
 }
 
-<<<<<<< HEAD
+# Initialize SQLAlchemy with naming convention
+db = SQLAlchemy()
+
 # Association table for many-to-many relationship
 property_amenity = db.Table('property_amenity',
     db.Column('property_id', db.Integer, db.ForeignKey('property.id'), primary_key=True),
     db.Column('amenity_id', db.Integer, db.ForeignKey('amenity.id'), primary_key=True)
 )
 
-class User(db.Model):
-=======
-# Initialize SQLAlchemy with metadata and naming convention
-db = SQLAlchemy(metadata=MetaData(naming_convention=convention))
-
 class User(db.Model, SerializerMixin):
->>>>>>> origin/cynan
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -85,9 +74,6 @@ class Profile(db.Model, SerializerMixin):
     phone_number = db.Column(db.String(20), nullable=False)
     address = db.Column(db.Text, nullable=False)
 
-<<<<<<< HEAD
 class Amenity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-=======
->>>>>>> origin/cynan
