@@ -5,9 +5,11 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from models import db, User, Property, Review, Amenity, Booking, Room
-from datetime import datetime
+from flask_mail import Mail, Message
+from datetime import datetime, timedelta
+import secrets
 
+# Initialize Flask app
 app = Flask(__name__)
 app.config.from_object('config.Config')
 
@@ -16,11 +18,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_ECHO'] = True
 
 # Initialize extensions
-db.init_app(app)
+db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 CORS(app)
+mail = Mail(app)
+
+# Import models
+from models import User, Property, Review, Amenity, Booking, Room, PasswordReset
 
 # Routes
 
@@ -205,6 +211,55 @@ def make_booking():
         db.session.rollback()
         return jsonify({"message": "Failed to create booking", "error": str(e)}), 500
 
+@app.route('/request-password-reset', methods=['POST'])
+def request_password_reset():
+    data = request.get_json()
+    email = data.get('email')
+
+    user = User.query.filter_by(email=email).first()
+    if user:
+        # Generate a unique token
+        token = secrets.token_urlsafe(32)
+
+        # Save the token to the database
+        password_reset = PasswordReset(user_id=user.id, token=token)
+        db.session.add(password_reset)
+        db.session.commit()
+
+        # Send the token to the user via email
+        msg = Message('Password Reset Request', recipients=[user.email])
+        msg.body = f'Use this link to reset your password: http://example.com/reset-password/{token}'
+        mail.send(msg)
+
+        return jsonify({'message': 'Password reset email sent.'}), 200
+    else:
+        return jsonify({'message': 'Email not found.'}), 404
+
+@app.route('/reset-password/<token>', methods=['POST'])
+def reset_password(token):
+    data = request.get_json()
+    password = data.get('password')
+
+    # Find the PasswordReset entry with the given token
+    password_reset = PasswordReset.query.filter_by(token=token).first()
+
+    if password_reset:
+        # Check if the token is still valid (e.g., within 1 hour of creation)
+        if password_reset.created_at + timedelta(hours=1) >= datetime.utcnow():
+            # Update the user's password
+            user = User.query.get(password_reset.user_id)
+            user.set_password(password)
+            
+            # Remove the password reset token from the database
+            db.session.delete(password_reset)
+            db.session.commit()
+
+            return jsonify({'message': 'Password reset successful.'}), 200
+        else:
+            return jsonify({'message': 'Token has expired.'}), 400
+    else:
+        return jsonify({'message': 'Invalid token.'}), 404
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({"message": "Resource not found"}), 404
@@ -223,3 +278,4 @@ def internal_server_error(error):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
