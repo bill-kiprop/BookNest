@@ -1,0 +1,73 @@
+.image{
+    width: 300px;
+    height: 300px;
+}
+.cards{
+    width: 299px;
+    background-color: #AB7967;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.page{background-color: #E6BEA0;
+    height: 100%;
+
+}
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .button-primary,
+  .button-secondary {
+    padding: 10px 20px;
+    margin-right: 10px;
+    font-size: 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  
+  .button-primary {
+    background-color:#8B9A46;
+    color: #fff;
+  }
+  
+  .button-secondary {
+    background-color:  #5D4037;
+    color: #333;
+  }
+  
+  .button-primary:hover,
+  .button-secondary:hover {
+    opacity: 0.8;
+    background-color: rgb(52, 47, 47);
+  }
+  .petimage{
+    width: 500px;
+    height:500px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .text{
+    color: #5D4037;
+  }
+
+  .detailspage{
+    background-color: #E6BEA0;
+    height: 100%;
+    padding: 20px;
+    padding-bottom: 190px;
+  }
+  .description{
+    font-size: x-large;
+  }
+  .pfp{
+    border-radius: 100%;
+  }
+  .userspage{
+    background-color: #E6BEA0;
+    height: 100%;
+    padding: 20px;
+    padding-bottom: 900px;
+  }
