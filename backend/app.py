@@ -1,4 +1,3 @@
-# app.py
 import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -77,6 +76,9 @@ def add_property():
     data = request.get_json()
     current_user = get_jwt_identity()
 
+    if not data or 'name' not in data or 'description' not in data or 'address' not in data:
+        return jsonify({"message": "Missing required fields"}), 400
+
     new_property = Property(host_id=current_user['id'], name=data['name'], description=data['description'], address=data['address'], images=0)
 
     try:
@@ -92,6 +94,9 @@ def add_property():
 def add_review():
     data = request.get_json()
     current_user = get_jwt_identity()
+
+    if not data or 'property_id' not in data or 'rating' not in data or 'comment' not in data:
+        return jsonify({"message": "Missing required fields"}), 400
 
     new_review = Review(user_id=current_user['id'], property_id=data['property_id'], rating=data['rating'], comment=data['comment'])
 
@@ -204,7 +209,17 @@ def make_booking():
 def not_found(error):
     return jsonify({"message": "Resource not found"}), 404
 
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({"message": "Bad request", "error": str(error)}), 400
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return jsonify({"message": "Unauthorized", "error": str(error)}), 401
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    return jsonify({"message": "Internal server error", "error": str(error)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
-
-
