@@ -1,3 +1,4 @@
+# app.py
 import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
@@ -5,9 +6,9 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-from models import db, User, Property, Review, Amenity
+from models import db, User, Property, Review, Amenity, Booking, Room
+from datetime import datetime
 
-# Initialize Flask application
 app = Flask(__name__)
 app.config.from_object('config.Config')
 
@@ -156,9 +157,54 @@ def add_amenity():
         db.session.rollback()
         return jsonify({"message": "Failed to add amenity", "error": str(e)}), 500
 
+@app.route('/properties/<int:property_id>/rooms', methods=['GET'])
+@jwt_required()
+def get_rooms(property_id):
+    rooms = Room.query.filter_by(property_id=property_id).all()
+    return jsonify([room.as_dict() for room in rooms]), 200
+
+@app.route('/properties/<int:property_id>/availability', methods=['GET'])
+@jwt_required()
+def check_availability(property_id):
+    data = request.args
+    check_in_date = datetime.strptime(data['check_in_date'], '%Y-%m-%d').date()
+    check_out_date = datetime.strptime(data['check_out_date'], '%Y-%m-%d').date()
+
+    # Check if any room in the property is available for the given dates
+    rooms = Room.query.filter_by(property_id=property_id).all()
+    for room in rooms:
+        bookings = Booking.query.filter_by(room_id=room.id).all()
+        for booking in bookings:
+            if check_in_date < booking.check_out_date and check_out_date > booking.check_in_date:
+                return jsonify({"available": False}), 200
+    return jsonify({"available": True}), 200
+
+@app.route('/bookings', methods=['POST'])
+@jwt_required()
+def make_booking():
+    data = request.get_json()
+    current_user = get_jwt_identity()
+
+    new_booking = Booking(
+        user_id=current_user['id'],
+        room_id=data['room_id'],
+        check_in_date=datetime.strptime(data['check_in_date'], '%Y-%m-%d').date(),
+        check_out_date=datetime.strptime(data['check_out_date'], '%Y-%m-%d').date()
+    )
+
+    try:
+        db.session.add(new_booking)
+        db.session.commit()
+        return jsonify({"message": "Booking created successfully"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": "Failed to create booking", "error": str(e)}), 500
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({"message": "Resource not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
