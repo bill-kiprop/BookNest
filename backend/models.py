@@ -1,7 +1,7 @@
-from sqlalchemy import MetaData
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 # Naming conventions for SQLAlchemy
 convention = {
@@ -12,8 +12,14 @@ convention = {
     "pk": "pk_%(table_name)s"
 }
 
-# Initialize SQLAlchemy with metadata and naming convention
-db = SQLAlchemy(metadata=MetaData(naming_convention=convention))
+# Initialize SQLAlchemy with naming convention
+db = SQLAlchemy()
+
+# Association table for many-to-many relationship
+property_amenity = db.Table('property_amenity',
+    db.Column('property_id', db.Integer, db.ForeignKey('property.id'), primary_key=True),
+    db.Column('amenity_id', db.Integer, db.ForeignKey('amenity.id'), primary_key=True)
+)
 
 class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +44,8 @@ class Property(db.Model, SerializerMixin):
     description = db.Column(db.Text, nullable=False)
     address = db.Column(db.String(200), nullable=False)
     images = db.Column(db.Integer, nullable=False)
+    amenities = db.relationship('Amenity', secondary=property_amenity, lazy='subquery',
+        backref=db.backref('properties', lazy=True))
 
 class Room(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -66,4 +74,14 @@ class Profile(db.Model, SerializerMixin):
     fullname = db.Column(db.String(100), nullable=False) 
     phone_number = db.Column(db.String(20), nullable=False)
     address = db.Column(db.Text, nullable=False)
+
+class Amenity(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+
+class PasswordReset(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    token = db.Column(db.String(128), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
