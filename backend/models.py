@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 # Naming conventions for SQLAlchemy
 convention = {
@@ -77,3 +78,10 @@ class Profile(db.Model, SerializerMixin):
 class Amenity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+
+class PasswordReset(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    token = db.Column(db.String(128), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
