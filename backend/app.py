@@ -8,6 +8,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_mail import Mail, Message
 from datetime import datetime, timedelta
 import secrets
+from models import db, User, Property, Review, Amenity, Booking, Room, PasswordReset
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -18,15 +19,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_ECHO'] = True
 
 # Initialize extensions
-db = SQLAlchemy(app)
+db.init_app(app)
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 CORS(app)
 mail = Mail(app)
-
-# Import models
-from models import User, Property, Review, Amenity, Booking, Room, PasswordReset
 
 # Routes
 
@@ -228,7 +226,7 @@ def request_password_reset():
 
         # Send the token to the user via email
         msg = Message('Password Reset Request', recipients=[user.email])
-        msg.body = f'Use this link to reset your password: http://example.com/reset-password/{token}'
+        msg.body = f'Use this link to reset your password: https://www.website.com/forgot-password/'
         mail.send(msg)
 
         return jsonify({'message': 'Password reset email sent.'}), 200
@@ -278,4 +276,3 @@ def internal_server_error(error):
 
 if __name__ == '__main__':
     app.run(debug=True)
-
