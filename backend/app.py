@@ -226,7 +226,7 @@ def request_password_reset():
 
         # Send the token to the user via email
         msg = Message('Password Reset Request', recipients=[user.email])
-        msg.body = f'Use this link to reset your password: https://www.website.com/forgot-password/'
+        msg.body = f'Use this link to reset your password: https://www.website.com/reset-password/{token}'
         mail.send(msg)
 
         return jsonify({'message': 'Password reset email sent.'}), 200
