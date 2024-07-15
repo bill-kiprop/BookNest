@@ -27,10 +27,10 @@ def get_or_create(model, defaults=None, **kwargs):
 def seed():
     with app.app_context():
         # Create users if they do not exist
-        user1, created1 = get_or_create(User, username='paul ngugi', defaults=dict(email='paul@gmail.com', password_hash='jokester907', images='default.jpg'))
-        user2, created2 = get_or_create(User, username='anne wanjiru', defaults=dict(email='anne@gmail.com', password_hash='mxyzptlk574', images='default.jpg'))
-        user3, created3 = get_or_create(User, username='mary wanjiru', defaults=dict(email='mary@gmail.com', password_hash='kol765red', images='default.jpg'))
-        user4, created4 = get_or_create(User, username='samuel ngugi', defaults=dict(email='samuel@gmail.com', password_hash='oid56890now', images='default.jpg'))
+        user1, created1 = get_or_create(User, username='paul ngugi', defaults=dict(email='paul@gmail.com', password_hash='jokester907', role='host', images='default.jpg'))
+        user2, created2 = get_or_create(User, username='anne wanjiru', defaults=dict(email='anne@gmail.com', password_hash='mxyzptlk574', role='guest', images='default.jpg'))
+        user3, created3 = get_or_create(User, username='mary wanjiru', defaults=dict(email='mary@gmail.com', password_hash='kol765red', role='guest', images='default.jpg'))
+        user4, created4 = get_or_create(User, username='samuel ngugi', defaults=dict(email='samuel@gmail.com', password_hash='oid56890now', role='guest', images='default.jpg'))
 
         if created1:
             profile1 = Profile(fullname='paul ngugi', phone_number='0798654325', address='123 Main St', user_id=user1.id)
@@ -106,6 +106,3 @@ def seed():
 
 if __name__ == '__main__':
     seed()
-
-
-
