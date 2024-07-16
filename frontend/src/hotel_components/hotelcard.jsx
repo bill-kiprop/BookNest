@@ -4,18 +4,18 @@ import Card from 'react-bootstrap/Card';
 
 
 
-function Hotelcard() {
+function Hotelcard({name, image, address}) {
  
 
 
   return (
     <Card style={{ width: '300px', border:'1px'}} >
-      <img variant="top" src="" className='image' style={{objectFit:'cover', borderRadius:'5px'}}/>
+      <img variant="top" src={image} className='image' style={{objectFit:'cover', borderRadius:'5px'}}/>
       <Card.Body className='cards'>
-        <Card.Title>name</Card.Title>
+        <Card.Title>{name}</Card.Title>
         <Card.Text>
-         AGE: <br/>
-         BREED:
+          
+         ADDRESS: {address}
         </Card.Text>
      
         <button className='button-primary'>book</button>
