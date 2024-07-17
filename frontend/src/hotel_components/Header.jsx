@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Header.css'; // Sample CSS file for styling
+import './Header.css'; 
 
 const Header = () => {
   return (
     <header className="header">
+      p<>BookNest
+      </>
       <div className="logo">
         <img src="https://images-platform.99static.com//bQcR1Oxo7dSk0X8Ivoein66R9g4=/29x2022:1986x3979/fit-in/500x500/99designs-contests-attachments/94/94697/attachment_94697235" alt="BNB App Logo" />
       </div>

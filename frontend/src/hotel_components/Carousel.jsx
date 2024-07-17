@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import './Carousel.css'; // Import your CSS file for styling
+import './Carousel.css'; 
 
 const Carousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const slides = [
     'https://cdn.ramseysolutions.net/media/blog/saving/travel-and-vacation/staycation-ideas.jpg',
     'https://t4.ftcdn.net/jpg/03/65/54/79/360_F_365547989_SBROeZWm90Z8b3WALedUclIsRR3xxzXF.jpg',
-    // Add more image URLs as needed
+  
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
       // Move to the next slide
       setCurrentSlide((prevSlide) => (prevSlide === slides.length - 1 ? 0 : prevSlide + 1));
-    }, 3000); // Change slide every 3 seconds (adjust as needed)
+    }, 3000); // Change slide every 3 seconds
 
     // Cleanup interval on component unmount
     return () => clearInterval(interval);
-  }, [slides.length]); // Depend on slides.length to re-run effect when slides change
+  }, [slides.length]); 
 
   return (
     <div id="carouselExampleControls" className="carousel slide" data-ride="carousel">
