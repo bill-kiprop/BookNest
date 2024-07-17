@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './hotel_components/Header';
-import Carousel from '.hotel_/components/Carousel'; 
-import AboutUs from '.hotel_/components/AboutUs';
-import Login from '.hotel_/components/Login';
-import Profile from '.hotel_/components/Profile';
+import Carousel from './hotel_components/Carousel'; 
+import AboutUs from './hotel_components/AboutUs';
+import Login from './hotel_components/Login';
+import Profile from './hotel_components/Profile';
 
 const App = () => {
   // Mock user data for demonstration
@@ -19,7 +19,7 @@ const App = () => {
       <div className="App">
         <Header />
         <Routes>
-          <Route path="/carousel" element={<Carousel />} /> 
+          <Route path="/" element={<Carousel />} /> 
           <Route path="/about" element={<AboutUs />} />
           <Route path="/profile" element={<Profile user={user} />} />
           <Route path="/login" element={<Login />} />
