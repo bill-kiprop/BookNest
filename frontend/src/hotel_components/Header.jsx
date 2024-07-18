@@ -1,22 +1,39 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Header.css'; 
+import './Header.css';
+
+// Simulated authentication check function
+const isAuthenticated = () => {
+  // Implement authentication logic here
+  // For demonstration now, this function  will return true
+  return true;
+};
 
 const Header = () => {
+  const auth = isAuthenticated(); //  actual authentication logic
+
   return (
     <header className="header">
       <div className="logo">
         <p>BookNest</p>
         <img
-          src="https://images-platform.99static.com//bQcR1Oxo7dSk0X8Ivoein66R9g4=/29x2022:1986x3979/fit-in/500x500/99designs-contests-attachments/94/94697/attachment_94697235"
+          src="https://c8.alamy.com/comp/2B147DT/initial-bn-letter-logo-with-creative-modern-business-typography-vector-template-creative-abstract-letter-bn-logo-design-2B147DT.jpg"
           alt="BNB App Logo"
         />
       </div>
       <nav>
         <ul>
           <li><Link to="/">Home</Link></li>
-          <li><Link to="/profile">Profile</Link></li>
-          <li><Link to="/login">Login</Link></li>
+          {auth && <li><Link to="/profile">Profile</Link></li>}
+          {auth ? (
+            <>
+              <li><Link to="/booking">Bookings</Link></li>
+              <li><Link to="/reviews">Reviews</Link></li>
+              <li><Link to="/login">Login</Link></li> 
+            </>
+          ) : (
+            <li><Link to="/login">Login</Link></li>
+          )}
         </ul>
       </nav>
     </header>

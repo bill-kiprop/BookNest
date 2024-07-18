@@ -11,7 +11,7 @@ const Home = () => {
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center mb-4">Welcome to Booknest</h2>
+      <h1 className="text-center mb-4">Welcome to Booknest</h1>
       
       <Carousel />
       

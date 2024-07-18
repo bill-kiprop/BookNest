@@ -12,7 +12,7 @@ const Carousel = () => {
           />
           <div className="carousel-caption d-none d-md-block">
             <h5>Stays</h5>
-            <p>Unwind in our beautiful rooms.</p>
+            <p>Unwind in our different stays.</p>
           </div>
         </div>
         <div className="carousel-item">
@@ -22,8 +22,8 @@ const Carousel = () => {
             alt="Slide 2"
           />
           <div className="carousel-caption d-none d-md-block">
-            <h5>Listings</h5>
-            <p>Time to relax your body.</p>
+            <h5>Cozy cottage</h5>
+            <p>A cozy place to stay.</p>
           </div>
         </div>
         <div className="carousel-item">
@@ -33,8 +33,8 @@ const Carousel = () => {
             alt="Slide 3"
           />
           <div className="carousel-caption d-none d-md-block">
-            <h5>Rooms</h5>
-            <p>Cozy amenities.</p>
+            <h5>Luxury Suite</h5>
+            <p>Experience luxury like never before.</p>
           </div>
         </div>
       </div>
