@@ -4,9 +4,10 @@
 }
 .cards{
     width: 299px;
-    background-color: #AB7967;
+    background-color: #ffffff;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
+    
 }
 .page{background-color: #E6BEA0;
     height: 100%;
