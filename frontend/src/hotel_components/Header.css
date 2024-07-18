@@ -1,0 +1,42 @@
+/* Header.css */
+
+header {
+  /* Optional additional styles for the header */
+}
+
+.booknest-title {
+  font-size: 3rem; /* Larger font size for prominence */
+  font-weight: bold; /* Makes the text bold */
+  color: #343a40; /* Initial dark gray color */
+  font-family: 'Arial', sans-serif; /* Clean, modern font */
+  position: relative; /* For positioning pseudo-elements if needed */
+  overflow: hidden; /* Ensures the animation stays within bounds */
+  animation: colorFadeInOut 5s ease-in-out infinite; /* Applies the color transition animation */
+}
+
+@keyframes colorFadeInOut {
+  0% {
+    opacity: 0; /* Starts with text invisible */
+    color: #343a40; /* Dark gray color at the start */
+    transform: translateY(-10px); /* Starts slightly above the final position */
+  }
+  50% {
+    opacity: 1; /* Fully visible in the middle of the animation */
+    color: #007bff; /* Changes to blue color in the middle */
+    transform: translateY(0); /* Returns to the original position */
+  }
+  100% {
+    opacity: 0; /* Ends with text invisible */
+    color: #343a40; /* Returns to dark gray color */
+    transform: translateY(10px); /* Ends slightly below the initial position */
+  }
+}
+
+.nav-link {
+  color: #343a40; /* Dark gray color for nav links */
+}
+
+.nav-link:hover {
+  color: #007bff; /* Changes color on hover */
+  text-decoration: underline; /* Adds underline on hover */
+}
