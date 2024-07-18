@@ -1,5 +1,6 @@
-import React from 'react'
-import useParams from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+// import useParams from 'react-router-dom'
+import { useParams } from 'react-router-dom';
 
 function HotelPage() {
   const [hotel, setHotel] = useState([]);
@@ -8,7 +9,7 @@ function HotelPage() {
     
 
 useEffect(() => {
-  fetch(`$http://localhost:5000/${params.id}`, {
+  fetch(`http://localhost:5000/${params.id}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -23,6 +24,9 @@ useEffect(() => {
 
   return (
     <div>
+      <div>
+        {hotel.image}
+      </div>
         {hotel.description}
     </div>
   )
