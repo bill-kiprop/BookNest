@@ -1,0 +1,43 @@
+/* Carousel.css */
+
+.custom-control {
+    background-color: black; /* Sets the background color of the buttons to black */
+    border: none; /* Removes default border */
+    width: 3rem; /* Adjust the width if needed */
+    height: 3rem; /* Adjust the height if needed */
+    border-radius: 50%; /* Makes the button round */
+  }
+  
+  .custom-control .carousel-control-prev-icon,
+  .custom-control .carousel-control-next-icon {
+    background-color: white; /* Sets the color of the icons to white */
+    border-radius: 50%; /* Ensures the icon background is round */
+    background-size: 50%; /* Adjusts the size of the icon within the button */
+  }
+  
+  /* Ensures the button appears on top of the carousel content */
+  .carousel-control-prev,
+  .carousel-control-next {
+    z-index: 1;
+  }
+  
+  /* Optional: Adds some hover effect to buttons */
+  .custom-control:hover {
+    background-color: #333; /* Darker black on hover */
+  }
+  /* Custom styles for the carousel controls */
+.custom-control-prev,
+.custom-control-next {
+  background-color: black; /* Sets the background color of the buttons to black */
+  border: none; /* Removes the default border */
+  width: 3rem; /* Adjusts the width of the buttons */
+  height: 3rem; /* Adjusts the height of the buttons */
+  border-radius: 50%; /* Makes the buttons round */
+}
+
+.custom-control-prev-icon,
+.custom-control-next-icon {
+  background-color: white; /* Sets the color of the icons to white */
+  background-size: 50%; /* Adjusts the size of the icons */
+  border-radius: 50%; /* Ensures the icon background is round */
+}
