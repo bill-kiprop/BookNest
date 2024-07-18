@@ -23,8 +23,10 @@ db.init_app(app)
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
-CORS(app)
 mail = Mail(app)
+
+# CORS configuration
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
 # Routes
 
@@ -48,7 +50,7 @@ def register():
 
     new_user = User(username=username, email=email, role=role, images=0)
     new_user.set_password(password)
-    
+
     try:
         db.session.add(new_user)
         db.session.commit()
@@ -226,7 +228,7 @@ def request_password_reset():
 
         # Send the token to the user via email
         msg = Message('Password Reset Request', recipients=[user.email])
-        msg.body = f'Use this link to reset your password: https://www.website.com/forgot-password/'
+        msg.body = f'Use this link to reset your password: https://www.website.com/reset-password/{token}'
         mail.send(msg)
 
         return jsonify({'message': 'Password reset email sent.'}), 200
@@ -276,3 +278,4 @@ def internal_server_error(error):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
