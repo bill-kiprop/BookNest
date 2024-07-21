@@ -1,35 +1,58 @@
-import React, { useEffect, useState } from 'react'
-// import useParams from 'react-router-dom'
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 
 function HotelPage() {
-  const [hotel, setHotel] = useState([]);
-  const params = useParams()
-  
-    
+  const [hotel, setHotel] = useState(null);
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-useEffect(() => {
-  fetch(`http://localhost:5000/${params.id}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      setHotel(data);
+  useEffect(() => {
+    fetch(`http://localhost:5000/properties/${id}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setHotel(data);
+      })
+      .catch((err) => {
+        console.error('Error fetching data:', err);
+      });
+  }, [id]);
+
+  const handleDelete = () => {
+    fetch(`http://localhost:5000/properties/${id}`, {
+      method: 'DELETE',
     })
-    .catch((err) => console.log(err));
-}, [params.id]);
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok');
+        }
+        // Redirect to the properties list or home page after successful deletion
+        navigate('/properties');
+      })
+      .catch((err) => {
+        console.error('Error deleting hotel:', err);
+      });
+  };
+
+  if (!hotel) {
+    return <div>Loading...</div>; // Show a loading message while data is being fetched
+  }
 
   return (
-    <div>
+    <div className='hotelPage'>
       <div>
-        {hotel.image}
+        <img src={hotel.images} alt="Hotel" className='pageImage' />
+        <h2>{hotel.name}</h2>
+        <h3>{hotel.address}</h3>
+        <p>{hotel.description}</p>
+        <button onClick={handleDelete} className='button-primary'>Delete</button>
       </div>
-        {hotel.description}
     </div>
-  )
+  );
 }
 
-export default HotelPage
+export default HotelPage;

@@ -1,0 +1,44 @@
+.navbar1{
+    background-color:  #D2691E;
+    ;
+    height: 100px;
+    padding-top: 30px;
+}
+.button{
+    border-radius: 5px;
+    background-color: grey;
+}
+.title{
+    color: white;
+}
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .button-primary,
+  .button-secondary {
+    padding: 10px 20px;
+    margin-right: 10px;
+    font-size: 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  
+  .button-primary {
+    background-color:#8B4513;
+    color: #fff;
+  }
+  
+  .button-secondary {
+    background-color:  #5D4037;
+    color: #333;
+  }
+  
+  .button-primary:hover,
+  .button-secondary:hover {
+    opacity: 0.8;
+    background-color: rgb(52, 47, 47);
+  }
