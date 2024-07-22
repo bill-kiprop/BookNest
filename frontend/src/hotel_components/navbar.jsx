@@ -14,7 +14,7 @@ function Navigationbar() {
           
         <Col xs={8}>
         <Navbar.Brand >
-            <h2 className='title'>GET A PET</h2>
+            <h2 className='title'>BOOKNEST</h2>
           </Navbar.Brand>
         </Col>
         <Col >
@@ -22,8 +22,13 @@ function Navigationbar() {
             <NavLink to ={"/"}>
                <button className='button-primary'> HOME</button>
                </NavLink>
-               <NavLink to={'/users'}>
+               <NavLink to={'/profile'}>
                <button className='button-primary'>PROFILES</button>
+               </NavLink>
+               <NavLink to={'/login'}>
+                <button className='button-primary'>
+                    LOGIN
+                </button>
                </NavLink>
                
               

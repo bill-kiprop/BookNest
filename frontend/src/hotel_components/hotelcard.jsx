@@ -14,7 +14,7 @@ function Hotelcard({ id, name, image, address, isHost, onDelete, onUpdate }) {
           ADDRESS: {address}
         </Card.Text>
         <NavLink to={`/properties/${id}`}>
-        <button className='button-primary'>Book</button>
+        <button className='button-primary'>VIEW</button>
         </NavLink>
         
       </Card.Body>

@@ -6,6 +6,7 @@ import HotelPage from '../hotel_components/hotelPage';
 import Home from '../hotel_components/Home';
 import Login from '../components/Login';
 import Signup from '../components/Signup';
+import Profile from '../components/Profile';
 
 const route = createBrowserRouter([
    {
@@ -26,6 +27,10 @@ const route = createBrowserRouter([
    },{
       path:'/signup',
       element:<Signup/>
+   },
+   {
+      path:'/profile',
+      element:<Profile/>
    }
 ])
   

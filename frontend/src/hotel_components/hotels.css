@@ -12,6 +12,7 @@
 .page{
   background-color: #F5F5DC;
     height: 100%;
+    font-family: 'Lora', serif;
 
 }
 .buttons-container {
@@ -77,6 +78,7 @@
     background-color: #F5F5DC;
     padding-bottom: 400px;
     color: rgb(0, 0, 0);
+    font-family: 'Lora', serif;
   }
   .pageImage{
     width: 500px;

@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Navigationbar from './navbar';
+import BookingFormModal from './BookingFormModal'; // Import the BookingFormModal component
 
 function HotelPage() {
   const [hotel, setHotel] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null); // To store the selected room data
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -30,7 +34,6 @@ function HotelPage() {
         if (!res.ok) {
           throw new Error('Network response was not ok');
         }
-        // Redirect to the properties list or home page after successful deletion
         navigate('/properties');
       })
       .catch((err) => {
@@ -38,19 +41,48 @@ function HotelPage() {
       });
   };
 
+  const handleBookClick = (room) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    setSelectedRoom(room); // Set the selected room
+    setShowModal(true); // Show the modal
+  };
+
   if (!hotel) {
     return <div>Loading...</div>; // Show a loading message while data is being fetched
   }
 
   return (
-    <div className='hotelPage'>
-      <div>
-        <img src={hotel.images} alt="Hotel" className='pageImage' />
-        <h2>{hotel.name}</h2>
-        <h3>{hotel.address}</h3>
-        <p>{hotel.description}</p>
-        <button onClick={handleDelete} className='button-primary'>Delete</button>
+    <div>
+      <Navigationbar />
+      <div className='hotelPage' style={{ paddingTop: '10px' }}>
+        <div style={{ paddingLeft: '10px' }}>
+          <img src={hotel.images} alt="Hotel" className='pageImage' />
+          <h2>{hotel.name}</h2>
+          <h3>{hotel.address}</h3>
+          <p>{hotel.description}</p>
+          <div>
+            <h4>Rooms:</h4>
+            <ul>
+              {hotel.rooms.map((room) => (
+                <li key={room.id}>
+                  {room.name}: {room.availability ? 'Available' : 'Not available'}<br />Price: ${room.price}
+                  <button onClick={() => handleBookClick(room)}>Book</button>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <button onClick={handleDelete} className='button-primary'>Delete</button>
+        </div>
       </div>
+      <BookingFormModal 
+        show={showModal} 
+        handleClose={() => setShowModal(false)} 
+        room={selectedRoom} 
+      />
     </div>
   );
 }

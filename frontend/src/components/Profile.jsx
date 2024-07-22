@@ -1,56 +1,88 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Profile = ({ currentUser, setCurrentUser }) => {
-    const [email, setEmail] = useState(currentUser?.email || '');
-    const [name, setName] = useState(currentUser?.name || '');
+const Profile = () => {
+    const [profile, setProfile] = useState(null);
+    const navigate = useNavigate();
 
-    const handleSave = (e) => {
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/login');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setProfile(data);
+                } else {
+                    navigate('/login');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                navigate('/login');
+            }
+        };
+
+        fetchProfile();
+    }, [navigate]);
+
+    const handleUpdate = async (e) => {
         e.preventDefault();
-        const updatedUser = { ...currentUser, email, name };
-        setCurrentUser(updatedUser);
-        alert('Profile updated successfully!');
+        const token = localStorage.getItem('token');
+
+        try {
+            const response = await fetch('http://localhost:5000/profile', {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(profile)
+            });
+
+            if (response.ok) {
+                alert('Profile updated successfully');
+            } else {
+                const { message } = await response.json();
+                alert(message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
-    if (!currentUser) return <p>Please log in to view your profile.</p>;
+    if (!profile) return <div>Loading...</div>;
 
     return (
         <div>
-            <h1>Profile</h1>
-            <form onSubmit={handleSave}>
-                <div>
-                    <label>Name:</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label>Email:</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <button type="submit">Save</button>
+            <h2>Profile</h2>
+            <form onSubmit={handleUpdate}>
+                <input
+                    type="text"
+                    value={profile.username}
+                    onChange={(e) => setProfile({ ...profile, username: e.target.value })}
+                />
+                <input
+                    type="email"
+                    value={profile.email}
+                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                />
+                <input
+                    type="text"
+                    value={profile.role}
+                    onChange={(e) => setProfile({ ...profile, role: e.target.value })}
+                />
+                <button type="submit">Update Profile</button>
             </form>
-            <h2>Your Profile</h2>
-            <p><strong>Username:</strong> {currentUser.username}</p>
-            <p><strong>Name:</strong> {currentUser.name}</p>
-            <p><strong>Email:</strong> {currentUser.email}</p>
         </div>
     );
-};
-
-Profile.propTypes = {
-    currentUser: PropTypes.shape({
-        username: PropTypes.string.isRequired,
-        email: PropTypes.string,
-        name: PropTypes.string,
-    }),
-    setCurrentUser: PropTypes.func.isRequired,
 };
 
 export default Profile;

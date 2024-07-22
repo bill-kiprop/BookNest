@@ -6,9 +6,10 @@ from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_mail import Mail, Message
+from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta
 import secrets
-from models import db, User, Property, Review, Amenity, Booking, Room, PasswordReset
+from models import db, User, Property, Review, Amenity, Booking, Room, PasswordReset, Profile,property_amenity
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -121,8 +122,17 @@ def get_properties():
 
 @app.route('/properties/<int:property_id>', methods=['GET'])
 def get_property(property_id):
-    property = Property.query.get_or_404(property_id)
-    return jsonify(property.as_dict()), 200
+    property = Property.query.options(
+        joinedload(Property.reviews),
+        joinedload(Property.rooms)
+    ).filter_by(id=property_id).first()
+
+    if property is None:
+        return jsonify({'error': 'Property not found'}), 404
+
+    property_dict = property.as_dict()
+
+    return jsonify(property_dict), 200
 
 @app.route('/properties/<int:property_id>', methods=['PUT'])
 @jwt_required()
@@ -259,6 +269,49 @@ def reset_password(token):
             return jsonify({'message': 'Token has expired.'}), 400
     else:
         return jsonify({'message': 'Invalid token.'}), 404
+    
+@app.route('/profile', methods=['GET', 'PUT'])
+@jwt_required()
+def manage_profile():
+    current_user = get_jwt_identity()
+    user_id = current_user['id']
+
+    if request.method == 'GET':
+        profile = Profile.query.filter_by(user_id=user_id).first()
+        if profile:
+            return jsonify({
+                'fullname': profile.fullname,
+                'phone_number': profile.phone_number,
+                'address': profile.address
+            }), 200
+        else:
+            return jsonify({'message': 'Profile not found'}), 404
+
+    if request.method == 'PUT':
+        data = request.get_json()
+        fullname = data.get('fullname')
+        phone_number = data.get('phone_number')
+        address = data.get('address')
+
+        if not fullname or not phone_number or not address:
+            return jsonify({'message': 'Missing required fields'}), 400
+
+        profile = Profile.query.filter_by(user_id=user_id).first()
+        if profile:
+            profile.fullname = fullname
+            profile.phone_number = phone_number
+            profile.address = address
+        else:
+            profile = Profile(user_id=user_id, fullname=fullname, phone_number=phone_number, address=address)
+            db.session.add(profile)
+
+        try:
+            db.session.commit()
+            return jsonify({'message': 'Profile updated successfully'}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'message': 'Failed to update profile', 'error': str(e)}), 500
+
 
 @app.errorhandler(404)
 def not_found(error):
@@ -277,5 +330,4 @@ def internal_server_error(error):
     return jsonify({"message": "Internal server error", "error": str(error)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
+    app.run()
