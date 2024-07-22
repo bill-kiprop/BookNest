@@ -46,6 +46,7 @@ function HotelPage() {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
+      alert('Log-in required')
       return;
     }
     setSelectedRoom(room);

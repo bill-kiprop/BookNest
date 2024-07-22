@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Navigationbar from '../hotel_components/navbar';
 
 const Profile = () => {
     const [profile, setProfile] = useState(null);
@@ -15,18 +16,37 @@ const Profile = () => {
 
             try {
                 const response = await fetch('http://localhost:5000/profile', {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(profile)
+                });
+    
+                if (response.ok) {
+                    alert('Profile updated successfully');
+                } else {
+                    const { message } = await response.json();
+                    alert(message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+            try {
+                const response = await fetch('http://localhost:5000/profile', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (response.ok) {
                     const data = await response.json();
                     setProfile(data);
-                } else {
-                    navigate('/login');
+                // } else {
+                //     navigate('/login');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                navigate('/login');
+                // navigate('/login');
             }
         };
 
@@ -37,31 +57,18 @@ const Profile = () => {
         e.preventDefault();
         const token = localStorage.getItem('token');
 
-        try {
-            const response = await fetch('http://localhost:5000/profile', {
-                method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(profile)
-            });
-
-            if (response.ok) {
-                alert('Profile updated successfully');
-            } else {
-                const { message } = await response.json();
-                alert(message);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        
     };
 
-    if (!profile) return <div>Loading...</div>;
+    if (!profile) return <div>
+        <Navigationbar/>
+        Loading...</div>;
 
     return (
         <div>
+            <div>
+                <Navigationbar/>
+            </div>
             <h2>Profile</h2>
             <form onSubmit={handleUpdate}>
                 <input

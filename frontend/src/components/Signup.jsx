@@ -71,16 +71,19 @@ const Signup = () => {
                         placeholder="Email"
                         required
                     />
-                    <input
-                        type="text"
+                    <select
                         value={role}
                         onChange={(e) => setRole(e.target.value)}
-                        placeholder="Role"
                         required
-                    />
+                        className='select'
+                    >
+                        <option value="" disabled>Select Role</option>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
                     <button type="submit" className='button-primary'>Signup</button>
                 </form>
-                <p>already have an account?<Link to={'/login'}>Login</Link></p>
+                <p>Already have an account? <Link to={'/login'}>Login</Link></p>
             </div>
         </div>
     );

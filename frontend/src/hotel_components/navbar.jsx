@@ -1,18 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Container, Nav,Navbar, Row,Col } from 'react-bootstrap'
 import { NavLink, useNavigate } from 'react-router-dom'
 import './navbar.css'
+import AddPropertyModal from './addProperty'
 
 
 function Navigationbar() {
   const previousPage = useNavigate()
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   return (
     
      <div className='navbar1'>
         <Container>
         <Row>
           
-        <Col xs={8}>
+        <Col xs={6}>
         <Navbar.Brand >
             <h2 className='title'>BOOKNEST</h2>
           </Navbar.Brand>
@@ -30,6 +35,9 @@ function Navigationbar() {
                     LOGIN
                 </button>
                </NavLink>
+               <button onClick={openModal} className='button-primary'>+</button>
+            <AddPropertyModal isOpen={isModalOpen} onClose={closeModal} />
+
                
               
                
