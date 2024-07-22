@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navigationbar from './navbar';
-import BookingFormModal from './BookingFormModal'; // Import the BookingFormModal component
+import BookingFormModal from './BookingFormModal';
+import './hotels.css'; 
 
 function HotelPage() {
   const [hotel, setHotel] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState(null); // To store the selected room data
+  const [selectedRoom, setSelectedRoom] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -47,41 +48,58 @@ function HotelPage() {
       navigate('/login');
       return;
     }
-    setSelectedRoom(room); // Set the selected room
-    setShowModal(true); // Show the modal
+    setSelectedRoom(room);
+    setShowModal(true);
   };
 
   if (!hotel) {
-    return <div>Loading...</div>; // Show a loading message while data is being fetched
+    return <div>Loading...</div>;
   }
 
   return (
     <div>
       <Navigationbar />
-      <div className='hotelPage' style={{ paddingTop: '10px' }}>
-        <div style={{ paddingLeft: '10px' }}>
-          <img src={hotel.images} alt="Hotel" className='pageImage' />
-          <h2>{hotel.name}</h2>
-          <h3>{hotel.address}</h3>
-          <p>{hotel.description}</p>
-          <div>
-            <h4>Rooms:</h4>
+      <div className="hotelPage">
+        <div className="hotelDetails">
+          <img src={hotel.images} alt="Hotel" className="pageImage" />
+          <div className="detailsText">
+            <h2>{hotel.name}</h2>
+            <h3>{hotel.address}</h3>
+            <p>{hotel.description}</p>
+          </div>
+        </div>
+        <div className="rooms">
+          <h4>Rooms:</h4>
+          <ul>
+            {hotel.rooms.map((room) => (
+              <li key={room.id}>
+                {room.name}: {room.availability ? 'Available' : 'Not available'}<br />Price: ${room.price}
+                <button onClick={() => handleBookClick(room)} className="button">Book</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className='reviews'>
+          <h3>Reviews:</h3>
+          {Array.isArray(hotel.reviews) && hotel.reviews.length > 0 ? (
             <ul>
-              {hotel.rooms.map((room) => (
-                <li key={room.id}>
-                  {room.name}: {room.availability ? 'Available' : 'Not available'}<br />Price: ${room.price}
-                  <button onClick={() => handleBookClick(room)}>Book</button>
+              {hotel.reviews.map((review) => (
+                <li key={review.id}>
+                  <p><strong>Rating:</strong> {review.rating}</p>
+                  <p><strong>Comment:</strong> {review.comment}</p>
                 </li>
               ))}
             </ul>
-          </div>
-          <button onClick={handleDelete} className='button-primary'>Delete</button>
+          ) : (
+            <p>No reviews available.</p>
+          )}
         </div>
+        
       </div>
-      <BookingFormModal 
-        show={showModal} 
-        handleClose={() => setShowModal(false)} 
-        room={selectedRoom} 
+      <BookingFormModal
+        show={showModal}
+        handleClose={() => setShowModal(false)}
+        room={selectedRoom}
       />
     </div>
   );
