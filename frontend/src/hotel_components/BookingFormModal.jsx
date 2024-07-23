@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
+import { Button, Form, Modal, Alert } from 'react-bootstrap';
 
-const BookingFormModal = ({ show, handleClose, room }) => {
+const BookingFormModal = ({ show, handleClose, room, onBookingSuccess }) => {
   const [roomId, setRoomId] = useState('');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
@@ -35,7 +35,8 @@ const BookingFormModal = ({ show, handleClose, room }) => {
       if (response.ok) {
         const result = await response.json();
         console.log('Booking successful:', result);
-        handleClose(); // Close the modal on successful submission
+        onBookingSuccess();
+        handleClose();
       } else {
         const errorData = await response.json();
         console.error('Error booking room:', errorData);
@@ -54,33 +55,16 @@ const BookingFormModal = ({ show, handleClose, room }) => {
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="formRoomId">
             <Form.Label>Room ID</Form.Label>
-            <Form.Control
-              type="text"
-              value={roomId}
-              readOnly
-            />
+            <Form.Control type="text" value={roomId} readOnly />
           </Form.Group>
-
           <Form.Group controlId="formCheckIn">
             <Form.Label>Check-in Date</Form.Label>
-            <Form.Control
-              type="datetime-local"
-              value={checkIn}
-              onChange={(e) => setCheckIn(e.target.value)}
-              required
-            />
+            <Form.Control type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} required />
           </Form.Group>
-
           <Form.Group controlId="formCheckOut">
             <Form.Label>Check-out Date</Form.Label>
-            <Form.Control
-              type="datetime-local"
-              value={checkOut}
-              onChange={(e) => setCheckOut(e.target.value)}
-              required
-            />
+            <Form.Control type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} required />
           </Form.Group>
-
           <Button variant="primary" type="submit">
             Book Now
           </Button>

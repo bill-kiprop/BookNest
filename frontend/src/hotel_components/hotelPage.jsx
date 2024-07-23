@@ -11,7 +11,7 @@ function HotelPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const fetchHotelData = () => {
     fetch(`http://localhost:5000/properties/${id}`)
       .then((res) => {
         if (!res.ok) {
@@ -25,6 +25,10 @@ function HotelPage() {
       .catch((err) => {
         console.error('Error fetching data:', err);
       });
+  };
+
+  useEffect(() => {
+    fetchHotelData();
   }, [id]);
 
   const handleDelete = () => {
@@ -46,7 +50,7 @@ function HotelPage() {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
-      alert('Log-in required')
+      alert('Log-in required');
       return;
     }
     setSelectedRoom(room);
@@ -56,6 +60,8 @@ function HotelPage() {
   if (!hotel) {
     return <div>Loading...</div>;
   }
+
+  const availableRooms = hotel.rooms.filter(room => room.availability);
 
   return (
     <div>
@@ -71,14 +77,20 @@ function HotelPage() {
         </div>
         <div className="rooms">
           <h4>Rooms:</h4>
-          <ul>
-            {hotel.rooms.map((room) => (
-              <li key={room.id}>
-                {room.name}: {room.availability ? 'Available' : 'Not available'}<br />Price: ${room.price}
-                <button onClick={() => handleBookClick(room)} className="button">Book</button>
-              </li>
-            ))}
-          </ul>
+          {availableRooms.length > 0 ? (
+            <ul>
+              {hotel.rooms.map((room) => (
+                <li key={room.id}>
+                  {room.name}:<br/> {room.availability ? 'available' :
+                   (<p style={{fontStyle:'italic', color:'GrayText'}}>Booked</p>)
+                   }<br />Price: ${room.price}
+                  {room.availability && <button onClick={() => handleBookClick(room)} className="button">Book</button>}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p style={{fontStyle:'italic', color:'GrayText'}}>The hotel is fully booked.</p>
+          )}
         </div>
         <div className='reviews'>
           <h3>Reviews:</h3>
@@ -95,12 +107,12 @@ function HotelPage() {
             <p>No reviews available.</p>
           )}
         </div>
-        
       </div>
       <BookingFormModal
         show={showModal}
         handleClose={() => setShowModal(false)}
         room={selectedRoom}
+        onBookingSuccess={fetchHotelData} // Pass the function to refresh hotel data
       />
     </div>
   );

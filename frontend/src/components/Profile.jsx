@@ -1,95 +1,77 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import axios from 'axios';
 import Navigationbar from '../hotel_components/navbar';
+import './Login.css';
 
-const Profile = () => {
-    const [profile, setProfile] = useState(null);
-    const navigate = useNavigate();
+const ProfileForm = () => {
+  const [fullname, setFullname] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [address, setAddress] = useState('');
+  const [message, setMessage] = useState('');
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                navigate('/login');
-                return;
-            }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:5000/profile', 
+        {
+          fullname,
+          phone_number: phoneNumber,
+          address,
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      setMessage(response.data.message);
+    } catch (error) {
+      setMessage('Failed to update profile');
+      console.error('There was an error!', error);
+    }
+  };
 
-            try {
-                const response = await fetch('http://localhost:5000/profile', {
-                    method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(profile)
-                });
-    
-                if (response.ok) {
-                    alert('Profile updated successfully');
-                } else {
-                    const { message } = await response.json();
-                    alert(message);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-            try {
-                const response = await fetch('http://localhost:5000/profile', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    setProfile(data);
-                // } else {
-                //     navigate('/login');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                // navigate('/login');
-            }
-        };
-
-        fetchProfile();
-    }, [navigate]);
-
-    const handleUpdate = async (e) => {
-        e.preventDefault();
-        const token = localStorage.getItem('token');
-
-        
-    };
-
-    if (!profile) return <div>
-        <Navigationbar/>
-        Loading...</div>;
-
-    return (
-        <div>
-            <div>
-                <Navigationbar/>
-            </div>
-            <h2>Profile</h2>
-            <form onSubmit={handleUpdate}>
-                <input
-                    type="text"
-                    value={profile.username}
-                    onChange={(e) => setProfile({ ...profile, username: e.target.value })}
-                />
-                <input
-                    type="email"
-                    value={profile.email}
-                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                />
-                <input
-                    type="text"
-                    value={profile.role}
-                    onChange={(e) => setProfile({ ...profile, role: e.target.value })}
-                />
-                <button type="submit">Update Profile</button>
-            </form>
-        </div>
-    );
+  return (
+    <div className='homepage'>
+      <div>
+        <Navigationbar />
+      </div>
+      <div className='login-container'>
+        <h2>Create Profile</h2>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>Full Name:</label>
+            <input
+              type="text"
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Phone Number:</label>
+            <input
+              type="text"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Address:</label>
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className='button-primary'>Create Profile</button>
+        </form>
+        {message && <p>{message}</p>}
+      </div>
+    </div>
+  );
 };
 
-export default Profile;
+export default ProfileForm;

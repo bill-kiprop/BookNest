@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navigationbar from '../hotel_components/navbar';
 import './Login.css';
+import { Alert } from 'react-bootstrap';
 
 
 const Login = () => {
@@ -21,8 +22,11 @@ const Login = () => {
 
             if (response.ok) {
                 const { access_token } = await response.json();
-                localStorage.setItem('token', access_token); // Save token to local storage
-                navigate('/profile'); // Redirect to profile page
+                localStorage.setItem('token', access_token);
+                <Alert key= 'success'variant='success' dismissible style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1050 }}>
+                    Successfully logged in
+                </Alert> 
+                navigate('/profile'); 
             } else {
                 const { message } = await response.json();
                 alert(message);

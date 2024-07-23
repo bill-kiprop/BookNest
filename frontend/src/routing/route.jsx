@@ -7,6 +7,8 @@ import Home from '../hotel_components/Home';
 import Login from '../components/Login';
 import Signup from '../components/Signup';
 import Profile from '../components/Profile';
+import ProfileForm from '../components/Profile';
+import ProfileDisplay from '../components/profiledisplay';
 
 const route = createBrowserRouter([
    {
@@ -30,7 +32,11 @@ const route = createBrowserRouter([
    },
    {
       path:'/profile',
-      element:<Profile/>
+      element:<ProfileDisplay/>
+   },
+   {
+      path:'/profilefill',
+      element:<ProfileForm/>
    }
 ])
   

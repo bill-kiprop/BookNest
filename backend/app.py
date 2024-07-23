@@ -27,13 +27,15 @@ jwt = JWTManager(app)
 mail = Mail(app)
 
 # CORS configuration
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173", "allow_headers": "*", "methods": "*"}})
 
 # Routes
 
 @app.route('/')
 def home():
     return '<h1>Home page</h1>'
+
+
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -42,6 +44,7 @@ def register():
     password = data.get('password')
     email = data.get('email')
     role = data.get('role')
+    image_url = data.get('image_url')  # Add this line
 
     if not username or not password or not email or not role:
         return jsonify({"message": "Missing required fields"}), 400
@@ -49,7 +52,7 @@ def register():
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "Username already exists"}), 400
 
-    new_user = User(username=username, email=email, role=role, images=0)
+    new_user = User(username=username, email=email, role=role, images=image_url)  # Modify this line
     new_user.set_password(password)
 
     try:
@@ -59,6 +62,7 @@ def register():
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": "Failed to register user", "error": str(e)}), 500
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -76,6 +80,32 @@ def login():
         return jsonify(access_token=access_token), 200
     else:
         return jsonify({"message": "Invalid credentials"}), 401
+    
+
+
+@app.route('/users', methods=['GET'])
+@jwt_required()
+def get_users():
+    try:
+        current_user = get_jwt_identity()
+        user = User.query.get(current_user['id'])
+        if user:
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'role': user.role,
+                'image': user.images
+            }
+            return jsonify(user_data), 200
+        else:
+            return jsonify({"message": "User not found"}), 404
+    except Exception as e:
+        app.logger.error(f'Error fetching user: {str(e)}')
+        return jsonify({"message": "Failed to fetch user", "error": str(e)}), 500
+
+
+
 
 @app.route('/properties', methods=['POST'])
 @jwt_required()
@@ -206,20 +236,32 @@ def make_booking():
     data = request.get_json()
     current_user = get_jwt_identity()
 
+    try:
+        check_in_date = datetime.strptime(data['check_in_date'], '%Y-%m-%d').date()
+        check_out_date = datetime.strptime(data['check_out_date'], '%Y-%m-%d').date()
+    except ValueError as e:
+        return jsonify({"message": "Invalid date format", "error": str(e)}), 400
+
     new_booking = Booking(
         user_id=current_user['id'],
         room_id=data['room_id'],
-        check_in_date=datetime.strptime(data['check_in_date'], '%Y-%m-%d').date(),
-        check_out_date=datetime.strptime(data['check_out_date'], '%Y-%m-%d').date()
+        check_in_date=check_in_date,
+        check_out_date=check_out_date
     )
 
     try:
+        room = Room.query.get(new_booking.room_id)
+        if not room.availability:
+            return jsonify({"message": "Room is not available"}), 400
+
+        room.availability = False
         db.session.add(new_booking)
         db.session.commit()
         return jsonify({"message": "Booking created successfully"}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": "Failed to create booking", "error": str(e)}), 500
+
 
 @app.route('/request-password-reset', methods=['POST'])
 def request_password_reset():
@@ -270,7 +312,9 @@ def reset_password(token):
     else:
         return jsonify({'message': 'Invalid token.'}), 404
     
-@app.route('/profile', methods=['GET', 'PUT'])
+
+
+@app.route('/profile', methods=['GET', 'POST'])
 @jwt_required()
 def manage_profile():
     current_user = get_jwt_identity()
@@ -287,7 +331,7 @@ def manage_profile():
         else:
             return jsonify({'message': 'Profile not found'}), 404
 
-    if request.method == 'PUT':
+    if request.method == 'POST':
         data = request.get_json()
         fullname = data.get('fullname')
         phone_number = data.get('phone_number')
@@ -311,6 +355,7 @@ def manage_profile():
         except Exception as e:
             db.session.rollback()
             return jsonify({'message': 'Failed to update profile', 'error': str(e)}), 500
+
 
 
 @app.errorhandler(404)

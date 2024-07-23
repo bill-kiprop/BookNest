@@ -8,6 +8,8 @@ const Signup = () => {
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
     const [role, setRole] = useState('');
+    const [imageUrl, setImageUrl] = useState(''); // Add state for image URL
+    const [message, setMessage] = useState(''); // Add state for message
     const navigate = useNavigate();
 
     const handleSignup = async (e) => {
@@ -17,7 +19,7 @@ const Signup = () => {
             const response = await fetch('http://localhost:5000/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, email, role })
+                body: JSON.stringify({ username, password, email, role, image_url: imageUrl }) // Include image_url
             });
 
             if (response.ok) {
@@ -30,16 +32,17 @@ const Signup = () => {
                 if (loginResponse.ok) {
                     const { access_token } = await loginResponse.json();
                     localStorage.setItem('token', access_token);
-                    navigate('/profile');
+                    navigate('/profilefill');
                 } else {
                     const { message } = await loginResponse.json();
-                    alert(message);
+                    setMessage(message);
                 }
             } else {
                 const { message } = await response.json();
-                alert(message);
+                setMessage(message);
             }
         } catch (error) {
+            setMessage('An unexpected error occurred. Please try again.');
             console.error('Error:', error);
         }
     };
@@ -81,8 +84,15 @@ const Signup = () => {
                         <option value="user">User</option>
                         <option value="admin">Admin</option>
                     </select>
+                    <input
+                        type="text"
+                        value={imageUrl}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                        placeholder="Image URL"
+                    />
                     <button type="submit" className='button-primary'>Signup</button>
                 </form>
+                {message && <p>{message}</p>}
                 <p>Already have an account? <Link to={'/login'}>Login</Link></p>
             </div>
         </div>

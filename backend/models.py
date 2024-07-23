@@ -2,9 +2,12 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from flask_bcrypt import Bcrypt
+
 
 # Initialize SQLAlchemy
 db = SQLAlchemy()
+bcrypt = Bcrypt()
 
 # Naming conventions for SQLAlchemy
 convention = {
