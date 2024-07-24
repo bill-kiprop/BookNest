@@ -30,9 +30,7 @@ const AddPropertyModal = ({ show, handleClose }) => {
         name,
         description,
         address,
-        images,
-        price,
-        amenities: amenities.split(',').map(item => item.trim()) // Assume amenities are provided as comma-separated values
+        images
       })
     })
     .then(res => {
@@ -44,7 +42,7 @@ const AddPropertyModal = ({ show, handleClose }) => {
     .then(data => {
       alert('Property added successfully!');
       handleClose();
-      navigate('/properties'); // Redirect to properties page or any other action
+      navigate('/properties'); 
     })
     .catch(err => {
       console.error('Error:', err);

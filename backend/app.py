@@ -11,25 +11,24 @@ from datetime import datetime, timedelta
 import secrets
 from models import db, User, Property, Review, Amenity, Booking, Room, PasswordReset, Profile,property_amenity
 
-# Initialize Flask app
+
 app = Flask(__name__)
 app.config.from_object('config.Config')
 
-# Configure database URI
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_ECHO'] = True
 
-# Initialize extensions
+
 db.init_app(app)
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 mail = Mail(app)
 
-# CORS configuration
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173", "allow_headers": "*", "methods": "*"}})
 
-# Routes
+
 
 @app.route('/')
 def home():
@@ -44,7 +43,7 @@ def register():
     password = data.get('password')
     email = data.get('email')
     role = data.get('role')
-    image_url = data.get('image_url')  # Add this line
+    image_url = data.get('image_url')  
 
     if not username or not password or not email or not role:
         return jsonify({"message": "Missing required fields"}), 400
@@ -52,7 +51,7 @@ def register():
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "Username already exists"}), 400
 
-    new_user = User(username=username, email=email, role=role, images=image_url)  # Modify this line
+    new_user = User(username=username, email=email, role=role, images=image_url)  
     new_user.set_password(password)
 
     try:
@@ -221,7 +220,7 @@ def check_availability(property_id):
     check_in_date = datetime.strptime(data['check_in_date'], '%Y-%m-%d').date()
     check_out_date = datetime.strptime(data['check_out_date'], '%Y-%m-%d').date()
 
-    # Check if any room in the property is available for the given dates
+    
     rooms = Room.query.filter_by(property_id=property_id).all()
     for room in rooms:
         bookings = Booking.query.filter_by(room_id=room.id).all()
@@ -270,15 +269,15 @@ def request_password_reset():
 
     user = User.query.filter_by(email=email).first()
     if user:
-        # Generate a unique token
+        
         token = secrets.token_urlsafe(32)
 
-        # Save the token to the database
+        
         password_reset = PasswordReset(user_id=user.id, token=token)
         db.session.add(password_reset)
         db.session.commit()
 
-        # Send the token to the user via email
+        
         msg = Message('Password Reset Request', recipients=[user.email])
         msg.body = f'Use this link to reset your password: https://www.website.com/reset-password/{token}'
         mail.send(msg)
@@ -292,17 +291,17 @@ def reset_password(token):
     data = request.get_json()
     password = data.get('password')
 
-    # Find the PasswordReset entry with the given token
+    
     password_reset = PasswordReset.query.filter_by(token=token).first()
 
     if password_reset:
-        # Check if the token is still valid (e.g., within 1 hour of creation)
+        
         if password_reset.created_at + timedelta(hours=1) >= datetime.utcnow():
-            # Update the user's password
+            
             user = User.query.get(password_reset.user_id)
             user.set_password(password)
             
-            # Remove the password reset token from the database
+            
             db.session.delete(password_reset)
             db.session.commit()
 

@@ -46,7 +46,7 @@ function Navigationbar() {
               <NavLink to={"/"}>
                 <button className='button-primary'> HOME</button>
               </NavLink>
-
+          
               <NavLink to={'/login'}>
                 <button className='button-primary'>
                   LOGIN

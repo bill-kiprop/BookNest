@@ -101,7 +101,7 @@ class Profile(db.Model):
     phone_number = db.Column(db.String(20), nullable=False)
     address = db.Column(db.Text, nullable=False)
     
-    # Relationship with User
+    
     user = db.relationship('User', backref=db.backref('profile', uselist=False))
 
     def as_dict(self):
