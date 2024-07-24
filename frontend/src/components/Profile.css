@@ -29,3 +29,11 @@
     border-radius: 4px;
     background-color: #f9f9f9;
 }
+.profile-page{
+    display: flex;
+    flex-direction: column;
+    /* align-items: ; */
+    justify-content:left;
+    height: 750px;
+    /* padding: 200px; */
+}

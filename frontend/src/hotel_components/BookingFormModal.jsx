@@ -1,16 +1,49 @@
-import React, { useState } from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Button, Form, Modal, Alert } from 'react-bootstrap';
 
-const BookingFormModal = ({ show, handleClose }) => {
+const BookingFormModal = ({ show, handleClose, room, onBookingSuccess }) => {
   const [roomId, setRoomId] = useState('');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    if (room) {
+      setRoomId(room.id);
+    }
+  }, [room]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log({ roomId, checkIn, checkOut });
-    handleClose(); // Close the modal on successful submission
+    
+    const token = localStorage.getItem('token');
+    const bookingData = {
+      room_id: roomId,
+      check_in_date: checkIn,
+      check_out_date: checkOut
+    };
+
+    try {
+      const response = await fetch('http://localhost:5000/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(bookingData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Booking successful:', result);
+        onBookingSuccess();
+        handleClose();
+      } else {
+        const errorData = await response.json();
+        console.error('Error booking room:', errorData);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -22,35 +55,16 @@ const BookingFormModal = ({ show, handleClose }) => {
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="formRoomId">
             <Form.Label>Room ID</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter Room ID"
-              value={roomId}
-              onChange={(e) => setRoomId(e.target.value)}
-              required
-            />
+            <Form.Control type="text" value={roomId} readOnly />
           </Form.Group>
-
           <Form.Group controlId="formCheckIn">
             <Form.Label>Check-in Date</Form.Label>
-            <Form.Control
-              type="datetime-local"
-              value={checkIn}
-              onChange={(e) => setCheckIn(e.target.value)}
-              required
-            />
+            <Form.Control type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} required />
           </Form.Group>
-
           <Form.Group controlId="formCheckOut">
             <Form.Label>Check-out Date</Form.Label>
-            <Form.Control
-              type="datetime-local"
-              value={checkOut}
-              onChange={(e) => setCheckOut(e.target.value)}
-              required
-            />
+            <Form.Control type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} required />
           </Form.Group>
-
           <Button variant="primary" type="submit">
             Book Now
           </Button>

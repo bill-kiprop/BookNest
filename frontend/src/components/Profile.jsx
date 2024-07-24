@@ -1,56 +1,77 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import axios from 'axios';
+import Navigationbar from '../hotel_components/navbar';
+import './Login.css';
 
-const Profile = ({ currentUser, setCurrentUser }) => {
-    const [email, setEmail] = useState(currentUser?.email || '');
-    const [name, setName] = useState(currentUser?.name || '');
+const ProfileForm = () => {
+  const [fullname, setFullname] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [address, setAddress] = useState('');
+  const [message, setMessage] = useState('');
 
-    const handleSave = (e) => {
-        e.preventDefault();
-        const updatedUser = { ...currentUser, email, name };
-        setCurrentUser(updatedUser);
-        alert('Profile updated successfully!');
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:5000/profile', 
+        {
+          fullname,
+          phone_number: phoneNumber,
+          address,
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      setMessage(response.data.message);
+    } catch (error) {
+      setMessage('Failed to update profile');
+      console.error('There was an error!', error);
+    }
+  };
 
-    if (!currentUser) return <p>Please log in to view your profile.</p>;
-
-    return (
-        <div>
-            <h1>Profile</h1>
-            <form onSubmit={handleSave}>
-                <div>
-                    <label>Name:</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label>Email:</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <button type="submit">Save</button>
-            </form>
-            <h2>Your Profile</h2>
-            <p><strong>Username:</strong> {currentUser.username}</p>
-            <p><strong>Name:</strong> {currentUser.name}</p>
-            <p><strong>Email:</strong> {currentUser.email}</p>
-        </div>
-    );
+  return (
+    <div className='homepage'>
+      <div>
+        <Navigationbar />
+      </div>
+      <div className='login-container'>
+        <h2>Create Profile</h2>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>Full Name:</label>
+            <input
+              type="text"
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Phone Number:</label>
+            <input
+              type="text"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Address:</label>
+            <input
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className='button-primary'>Create Profile</button>
+        </form>
+        {message && <p>{message}</p>}
+      </div>
+    </div>
+  );
 };
 
-Profile.propTypes = {
-    currentUser: PropTypes.shape({
-        username: PropTypes.string.isRequired,
-        email: PropTypes.string,
-        name: PropTypes.string,
-    }),
-    setCurrentUser: PropTypes.func.isRequired,
-};
-
-export default Profile;
+export default ProfileForm;
