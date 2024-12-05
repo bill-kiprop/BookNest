@@ -1,0 +1,35 @@
+.homepage{
+    background-color: #F5F5DC;
+    color: #5A3E36;
+    font-family: 'Lora', serif;
+
+}
+.heading{
+    color: #8B4513;
+}
+.button-primary,
+.button-secondary {
+  padding: 10px 20px;
+  margin-right: 10px;
+  font-size: 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.button-primary {
+  background-color:#8B4513;
+  color: #fff;
+}
+
+.button-secondary {
+  background-color:  #5D4037;
+  color: #333;
+}
+
+.button-primary:hover,
+.button-secondary:hover {
+  opacity: 0.8;
+  background-color: #8B4513;
+  color: #fff;
+}

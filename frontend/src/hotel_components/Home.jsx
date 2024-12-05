@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import Carousel from './Carousel'; 
 import BookingFormModal from './BookingFormModal'; 
-import { Button, Card, Container } from 'react-bootstrap'; 
+import { Button, Card, Container, Navbar } from 'react-bootstrap'; 
+import { NavLink } from 'react-router-dom';
+import Navigationbar from './navbar';
+import './home.css'
 
 const Home = () => {
   const [showModal, setShowModal] = useState(false);
@@ -10,15 +13,22 @@ const Home = () => {
   const handleClose = () => setShowModal(false);
 
   return (
-    <div className="container mt-5">
-      <h1 className="text-center mb-4">Welcome to Booknest</h1>
+    <div className='homepage'>
+      <Navigationbar/>
+    <div className="container mt-5 ">
+      
+      <h1 className="text-center mb-4 heading">Welcome to Booknest</h1>
       
       <Carousel />
       
       <div className="text-center mt-4 mb-4">
-        <Button variant="primary" onClick={handleShow}>
-          Book a Room
-        </Button>
+    <NavLink to={'/properties'}>
+      <button className='button-primary'>
+         View properties
+        </button>
+    </NavLink>
+      
+
       </div>
       
       <Container className="mt-4">
@@ -61,6 +71,7 @@ const Home = () => {
       </Container>
       
       <BookingFormModal show={showModal} handleClose={handleClose} />
+    </div>
     </div>
   );
 };

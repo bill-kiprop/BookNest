@@ -1,0 +1,102 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import Navigationbar from '../hotel_components/navbar';
+import './Login.css'; // Import the same CSS file
+
+const Signup = () => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
+    const [role, setRole] = useState('');
+    const [imageUrl, setImageUrl] = useState(''); // Add state for image URL
+    const [message, setMessage] = useState(''); // Add state for message
+    const navigate = useNavigate();
+
+    const handleSignup = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch('http://localhost:5000/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, email, role, image_url: imageUrl }) // Include image_url
+            });
+
+            if (response.ok) {
+                const loginResponse = await fetch('http://localhost:5000/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (loginResponse.ok) {
+                    const { access_token } = await loginResponse.json();
+                    localStorage.setItem('token', access_token);
+                    navigate('/profilefill');
+                } else {
+                    const { message } = await loginResponse.json();
+                    setMessage(message);
+                }
+            } else {
+                const { message } = await response.json();
+                setMessage(message);
+            }
+        } catch (error) {
+            setMessage('An unexpected error occurred. Please try again.');
+            console.error('Error:', error);
+        }
+    };
+
+    return (
+        <div className='homepage'>
+            <Navigationbar />
+            <div className="login-container">
+                <h2>Signup</h2>
+                <form onSubmit={handleSignup}>
+                    <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Username"
+                        required
+                    />
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                        required
+                    />
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Email"
+                        required
+                    />
+                    <select
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        required
+                        className='select'
+                    >
+                        <option value="" disabled>Select Role</option>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <input
+                        type="text"
+                        value={imageUrl}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                        placeholder="Image URL"
+                    />
+                    <button type="submit" className='button-primary'>Signup</button>
+                </form>
+                {message && <p>{message}</p>}
+                <p>Already have an account? <Link to={'/login'}>Login</Link></p>
+            </div>
+        </div>
+    );
+};
+
+export default Signup;
